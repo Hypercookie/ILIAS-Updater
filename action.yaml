@@ -41,3 +41,9 @@ runs:
     - name: Run ILIAS Downloader
       shell: bash
       run: python3 ${{ github.action_path }}/ilias/run.py
+      env:
+        BASE_URL: ${{inputs.base_url}}
+        REF_ID: ${{inputs.ref_id}}
+        USERNAME: ${{inputs.username}}
+        PASSWORD: ${{inputs.password}}
+        CREATE_BRANCH: ${{inputs.create_branch}}
