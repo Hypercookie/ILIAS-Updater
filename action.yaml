@@ -16,10 +16,6 @@ inputs:
   password:
     description: 'The Password of the ILIAS User'
     required: true
-  create_branch:
-    description: "If set to false, will push directly into master/main"
-    required: false
-    default: 'true'
 runs:
   using: 'composite'
   steps:
@@ -40,4 +36,3 @@ runs:
         REF_ID: ${{inputs.ref_id}}
         USERNAME: ${{inputs.username}}
         PASSWORD: ${{inputs.password}}
-        CREATE_BRANCH: ${{inputs.create_branch}}
