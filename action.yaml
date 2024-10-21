@@ -1,5 +1,8 @@
 name: 'ILIAS Downloader Action'
 description: 'Downloads ILIAS Content and creates pull requests'
+branding:
+  color: blue
+  icon: disc
 inputs:
   base_url:
     description: "The base URL of ILIAS"
