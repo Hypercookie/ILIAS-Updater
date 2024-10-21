@@ -28,7 +28,7 @@ runs:
       with:
           python-version: '3.12'
     - name: Install Dependencies
-      run: pip3 install -r ${{ github.action_path }/requirements.txt
+      run: pip3 install -r ${{ github.action_path }}/requirements.txt
       shell: bash
     - name: Pass Inputs to Shell
       shell: bash
@@ -39,4 +39,4 @@ runs:
         echo "CREATE_BRANCH=${{ inputs.create_branch }}" >> $GITHUB_ENV
     - name: Run ILIAS Downloader
       shell: bash
-      run: python3 ${{ github.action_path }/ilias/run.py
+      run: python3 ${{ github.action_path }}/ilias/run.py
