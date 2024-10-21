@@ -1,0 +1,39 @@
+name: 'ILIAS Downloader Action'
+description: 'Downloads ILIAS Content and creates pull requests'
+inputs:
+  base_url:
+    description: "The base URL of ILIAS"
+    required: true
+  ref_id:
+    description: 'The ID of the ILIAS Repo'
+    required: true
+  username:
+    description: 'The Username of the ILIAS User'
+    required: true
+  password:
+    description: 'The Password of the ILIAS User'
+    required: true
+  create_branch:
+    description: "If set to false, will push directly into master/main"
+    required: false
+    default: 'true'
+runs:
+  using: 'composite'
+  steps:
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+          python-version: '3.12'
+    - name: Install Dependencies
+      run: pip3 install -r requirements.txt
+      shell: bash
+    - name: Pass Inputs to Shell
+      shell: bash
+      run: |
+        echo "REF_ID=${{ inputs.ref_id }}" >> $GITHUB_ENV
+        echo "USERNAME=${{ inputs.username }}" >> $GITHUB_ENV
+        echo "PASSWORD=${{ inputs.password }}" >> $GITHUB_ENV
+        echo "CREATE_BRANCH=${{ inputs.create_branch }}" >> $GITHUB_ENV
+    - name: Run ILIAS Downloader
+      shell: bash
+      run: python3 ./ilias/run.py
