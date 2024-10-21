@@ -9,4 +9,4 @@ def normalise(url):
     return url if urlparse(url).path else url + "/"
 
 
-BASE_URL = normalise(os.getenv("URL"))
+BASE_URL = normalise(os.getenv("BASE_URL"))
