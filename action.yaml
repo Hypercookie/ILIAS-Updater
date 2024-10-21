@@ -23,17 +23,12 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Set GitHub Path
-      run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
-      shell: bash
-      env:
-        GITHUB_ACTION_PATH: ${{ github.action_path }}
     - name: Install Python
       uses: actions/setup-python@v5
       with:
           python-version: '3.12'
     - name: Install Dependencies
-      run: pip3 install -r requirements.txt
+      run: pip3 install -r ${{ github.action_path }/requirements.txt
       shell: bash
     - name: Pass Inputs to Shell
       shell: bash
@@ -44,4 +39,4 @@ runs:
         echo "CREATE_BRANCH=${{ inputs.create_branch }}" >> $GITHUB_ENV
     - name: Run ILIAS Downloader
       shell: bash
-      run: python3 ./ilias/run.py
+      run: python3 ${{ github.action_path }/ilias/run.py
