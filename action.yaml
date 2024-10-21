@@ -23,6 +23,8 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
     - name: Install Python
       uses: actions/setup-python@v5
       with:
@@ -30,14 +32,6 @@ runs:
     - name: Install Dependencies
       run: pip3 install -r ${{ github.action_path }}/requirements.txt
       shell: bash
-    - name: Pass Inputs to Shell
-      shell: bash
-      run: |
-        echo "BASE_URL=${{ inputs.base_url }}" >> $GITHUB_ENV
-        echo "REF_ID=${{ inputs.ref_id }}" >> $GITHUB_ENV
-        echo "USERNAME=${{ inputs.username }}" >> $GITHUB_ENV
-        echo "PASSWORD=${{ inputs.password }}" >> $GITHUB_ENV
-        echo "CREATE_BRANCH=${{ inputs.create_branch }}" >> $GITHUB_ENV
     - name: Run ILIAS Downloader
       shell: bash
       run: python3 ${{ github.action_path }}/ilias/run.py

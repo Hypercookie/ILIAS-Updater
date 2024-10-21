@@ -17,7 +17,19 @@ def get_filename_from_cd(cd):
     fname = re.findall('filename=(.+)', cd)
     if len(fname) == 0:
         return None
-    return fname[0].replace('"',"")
+    return fname[0].replace('"', "")
+
+
+def find_header_from_element(element):
+    # Search upwards for the parent with class 'ilContainerBlock'
+    parent_block = element.find_parent(class_='ilContainerBlock')
+
+    if parent_block:
+        # Search downwards for the element with class 'ilContainerBlockHeader'
+        header_element = parent_block.find(class_='ilContainerBlockHeader')
+        if header_element:
+            return header_element.text.strip()  # Return the text content of the header
+    return None  # Return None if not found
 
 
 class Repository:
@@ -47,17 +59,25 @@ class Repository:
     def discover_direct_links(self):
         for link in self.discover_links():
             if "calldirectlink" in link["href"]:
+                header_text = find_header_from_element(link)
                 r = INSTANCE.session.get(f"{BASE_URL}{link["href"]}")
                 if r.history:
                     for req in r.history:
                         if not req.url.startswith(BASE_URL) or len(r.history) == 1:
-                            yield {"name": link.decode_contents(), "url": req.url}
+                            if header_text and header_text != "Inhalt":
+                                yield {"name": link.decode_contents(), "url": req.url, "path": header_text}
+                            else:
+                                yield {"name": link.decode_contents(), "url": req.url}
                             break
 
     def discover_files(self):
         for link in self.discover_links():
             if "target=file" in link["href"]:
-                yield {"name": link.decode_contents(), "url": link["href"]}
+                header_text = find_header_from_element(link)
+                if header_text and header_text != "Inhalt":
+                    yield {"name": link.decode_contents(), "url": link["href"], "path": header_text}
+                else:
+                    yield {"name": link.decode_contents(), "url": link["href"]}
 
     def discover_sub_repos(self):
         for link in self.discover_links():
@@ -68,17 +88,25 @@ class Repository:
                     # Is sub-repo
                     yield Repository(int(captured_value), link.decode_contents())
 
-    def write_files(self, base_path: str = "./"):
-        os.makedirs(base_path, exist_ok=True)
+    def write_files(self, base_path: str = "."+os.sep):
+
         for f in self.discover_files():
+            p = base_path
+            if "path" in f:
+                p = p + os.sep + f["path"] + os.sep
+            os.makedirs(p, exist_ok=True)
             r = INSTANCE.session.get(f["url"])
             filename = get_filename_from_cd(r.headers.get('content-disposition'))
-            print(f"Writing {base_path + filename}")
-            with open(base_path + filename, 'wb') as f_write:
+            print(f"Writing {p + filename}")
+            with open(p + filename, 'wb') as f_write:
                 f_write.write(r.content)
         for l in self.discover_direct_links():
-            print(f"Writing {base_path + l['name'] + ".url"}")
-            with open(base_path + l['name'] + ".url", 'w') as f_write:
+            p = base_path
+            if "path" in l:
+                p = p + os.sep + l["path"] + os.sep
+            print(f"Writing {p + l['name'] + ".url"}")
+            os.makedirs(p, exist_ok=True)
+            with open(p + l['name'] + ".url", 'w') as f_write:
                 f_write.write(l['url'])
         for sub_repo in self.discover_sub_repos():
-            sub_repo.write_files(base_path + sub_repo.name + "/")
+            sub_repo.write_files(base_path + sub_repo.name + os.sep)
