@@ -1,0 +1,29 @@
+# .github/workflows/run-custom-action.yml
+name: Run Custom Action on Push
+
+# Trigger the workflow on any push event
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - "*"
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Run the custom action from the repository
+      - name: Run Custom Action
+        uses: ./ 
+
+        # If your action has inputs, provide them here
+        with:
+                  base_url: ${{ secrets.BASE_URL}}
+                  ref_id: ${{ secrets.REF_ID}}
+                  username: ${{ secrets.ILIAS_USERNAME}}
+                  password: ${{ secrets.ILIAS_PASSWORD}}
