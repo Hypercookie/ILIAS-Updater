@@ -88,12 +88,12 @@ class Repository:
                     # Is sub-repo
                     yield Repository(int(captured_value), link.decode_contents())
 
-    def write_files(self, base_path: str = "."+os.sep):
+    def write_files(self, base_path: str = "." + os.sep):
 
         for f in self.discover_files():
             p = base_path
             if "path" in f:
-                p = p + os.sep + f["path"] + os.sep
+                p = p + f["path"] + os.sep
             os.makedirs(p, exist_ok=True)
             r = INSTANCE.session.get(f["url"])
             filename = get_filename_from_cd(r.headers.get('content-disposition'))
@@ -103,7 +103,7 @@ class Repository:
         for l in self.discover_direct_links():
             p = base_path
             if "path" in l:
-                p = p + os.sep + l["path"] + os.sep
+                p = p + l["path"] + os.sep
             print(f"Writing {p + l['name'] + ".url"}")
             os.makedirs(p, exist_ok=True)
             with open(p + l['name'] + ".url", 'w') as f_write:
